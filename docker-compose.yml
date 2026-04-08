@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  wireguard:
+    image: ghcr.io/linuxserver/wireguard
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /etc/wireguard:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+    restart: always

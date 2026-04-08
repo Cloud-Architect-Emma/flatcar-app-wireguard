@@ -1,0 +1,37 @@
+variant: flatcar
+version: 1.0.0
+
+storage:
+  directories:
+    - path: /opt/wireguard
+      mode: 0755
+    - path: /etc/wireguard
+      mode: 0700
+
+systemd:
+  units:
+    - name: docker.service
+      enabled: true
+
+    - name: wireguard.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=WireGuard VPN container
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        Restart=always
+        ExecStart=/usr/bin/docker run \
+          --name wireguard \
+          --cap-add=NET_ADMIN \
+          -v /etc/wireguard:/etc/wireguard \
+          -p 51820:51820/udp \
+          ghcr.io/linuxserver/wireguard
+
+        ExecStop=/usr/bin/docker stop wireguard
+        ExecStopPost=/usr/bin/docker rm wireguard
+
+        [Install]
+        WantedBy=multi-user.target
